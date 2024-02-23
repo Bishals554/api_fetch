@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomePage extends ConsumerWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
+  final TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final TextEditingController searchController = TextEditingController();
     final userData = ref.watch(userDataProvider);
-    final searchQuery = ref.watch(searchQueryProvider.notifier).state;
+    textController.text = ref.watch(searchQueryProvider);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue.shade900,
@@ -20,18 +20,19 @@ class HomePage extends ConsumerWidget {
           height: 35,
           width: MediaQuery.of(context).size.width * 0.6,
           child: TextField(
-            controller: searchController,
-            onSubmitted: (value) {
-              print('change');
-              ref.read(searchQueryProvider.notifier).state = value;
-              // ref.refresh(searchQueryProvider);
+            controller: textController,
+            onChanged: (value) {
+              ref
+                  .read(searchQueryProvider.notifier)
+                  .update((state) => state = value);
             },
+            onEditingComplete: () {},
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.search),
               suffixIcon: GestureDetector(
                   onTap: () {
                     ref.read(searchQueryProvider.notifier).state = '';
-                    searchController.clear();
+                    textController.clear();
                     Future.delayed(const Duration(milliseconds: 1), () {
                       return ref.refresh(searchQueryProvider);
                     });
@@ -54,8 +55,10 @@ class HomePage extends ConsumerWidget {
           data: (userData) {
             List<UserData?> userDataList =
                 userData!.data!.map((element) => element).toList();
-            final filteredList = userDataList.where((element) =>
-                element!.employeeName!.toLowerCase().contains(searchQuery));
+            final filteredList = userDataList.where((element) => element!
+                .employeeName!
+                .toLowerCase()
+                .contains(textController.text));
             return ListView.builder(
               itemCount: filteredList.length,
               itemBuilder: (context, index) {
