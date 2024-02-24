@@ -12,7 +12,7 @@ class HomePage extends ConsumerWidget {
   final TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userData = ref.watch(userDataProvider);
+    var userData = ref.watch(userDataProvider);
     textController.text = ref.watch(searchQueryProvider);
     final sortingOrder = ref.watch(sortingOrderProvider);
     return Scaffold(
@@ -58,29 +58,60 @@ class HomePage extends ConsumerWidget {
             Consumer(
               builder: (context, ref, child) {
                 final sortingOrder = ref.watch(sortingOrderProvider);
-                return GestureDetector(
-                    onTap: () {
-                      ref.read(sortingOrderProvider.notifier).update((state) {
-                        return state == 'Ascending'
-                            ? 'Descending'
-                            : 'Ascending';
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        RotatedBox(
-                          quarterTurns: 1,
-                          child: Icon(
-                            Icons.compare_arrows,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          sortingOrder,
-                          style: TextStyle(fontSize: 12, color: Colors.white),
-                        )
-                      ],
-                    ));
+                return PopupMenuButton(
+                  position: PopupMenuPosition.under,
+                  icon: Icon(
+                    Icons.sort,
+                    color: Colors.white,
+                  ),
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      PopupMenuItem(
+                        child: Text('Default'),
+                        value: 'Default',
+                      ),
+                      PopupMenuItem(
+                        child: Text('Ascending'),
+                        value: 'Ascending',
+                      ),
+                      PopupMenuItem(
+                        child: Text('Descending'),
+                        value: 'Descending',
+                      ),
+                    ];
+                  },
+                  onSelected: (value) {
+                    ref.read(sortingOrderProvider.notifier).state = value;
+                  },
+                );
+
+                // GestureDetector(
+                //   onTap: () {
+                // ref.read(sortingOrderProvider.notifier).update((state) {
+                //   return state == 'Ascending' ? 'Descending' : 'Ascending';
+                // });
+                //   },
+                //   child: Icon(
+                //     Icons.sort,
+                //     color: Colors.white,
+                //   ),
+                //   // Row(
+                //   //   children: [
+                //   //     const RotatedBox(
+                //   //       quarterTurns: 1,
+                //   //       child: Icon(
+                //   //         Icons.compare_arrows,
+                //   //         color: Colors.white,
+                //   //       ),
+                //   //     ),
+                //   //     Text(
+                //   //       sortingOrder,
+                //   //       style: const TextStyle(
+                //   //           fontSize: 12, color: Colors.white),
+                //   //     )
+                //   //   ],
+                //   // )
+                // );
               },
             ),
           ],
@@ -93,7 +124,7 @@ class HomePage extends ConsumerWidget {
           if (sortingOrder == 'Ascending') {
             userDataList
                 .sort((a, b) => a!.employeeName!.compareTo(b!.employeeName!));
-          } else {
+          } else if (sortingOrder == 'Descending') {
             userDataList
                 .sort((a, b) => b!.employeeName!.compareTo(a!.employeeName!));
           }
@@ -115,7 +146,24 @@ class HomePage extends ConsumerWidget {
             },
           );
         },
-        error: (error, stackTrace) => Text(error.toString()),
+        error: (error, stackTrace) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(error.toString()),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  userData = ref.refresh(userDataProvider);
+                } catch (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to fetch data: $error')),
+                  );
+                }
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
         loading: () => const Center(
           child: CircularProgressIndicator(),
         ),

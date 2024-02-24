@@ -5,13 +5,13 @@ class CustomList extends StatelessWidget {
   final String employeeName;
   final int employeeSalary;
   final int employeeAge;
-  final String profileImage;
+  final String? profileImage;
   const CustomList({
     super.key,
     required this.id,
     required this.employeeName,
     required this.employeeSalary,
-    required this.profileImage,
+    this.profileImage,
     required this.employeeAge,
   });
   @override
@@ -24,8 +24,14 @@ class CustomList extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 CircleAvatar(
-                  backgroundImage: NetworkImage(profileImage),
+                  backgroundImage:
+                      profileImage != null && profileImage!.isNotEmpty
+                          ? NetworkImage(profileImage!)
+                          : null,
                   maxRadius: 30,
+                  child: profileImage == null || profileImage!.isEmpty
+                      ? const Icon(Icons.person)
+                      : null,
                 ),
                 const SizedBox(
                   width: 16,
@@ -40,7 +46,7 @@ class CustomList extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Name: ${employeeName}',
+                              'Name: $employeeName',
                               style: const TextStyle(fontSize: 14),
                             ),
                             Text(
