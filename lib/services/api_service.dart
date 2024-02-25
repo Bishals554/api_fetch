@@ -13,8 +13,6 @@ class ApiService {
   Future<DataModel?> getData() async {
     try {
       final response = await dio.get(url);
-      print(response.data);
-      print(response.statusCode);
 
       if (response.statusCode == HttpStatus.ok) {
         return DataModel.fromJson(response.data);
@@ -22,14 +20,7 @@ class ApiService {
         return null;
       }
     } catch (e) {
-      if (e is DioException &&
-          e.response?.statusCode == HttpStatus.tooManyRequests) {
-        // Retry after a short delay
-        await Future.delayed(Duration(seconds: 5));
-      } else {
-        rethrow; // Rethrow the exception if it's not a 429 error
-      }
+      rethrow;
     }
-    return null;
   }
 }

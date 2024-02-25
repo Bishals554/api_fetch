@@ -10,25 +10,17 @@ void main() {
         dataProvider.overrideWithValue(ApiService()),
       ]);
 
-      // Call the getData method
       final result = await container.read(dataProvider).getData();
 
-      // Verify that the result is not null and is of type DataModel
       expect(result, isA<DataModel>());
     });
-  });
+    test('getData returns null when HTTP status code is not 200', () async {
+      final container = ProviderContainer(overrides: [
+        dataProvider.overrideWithValue(ApiService()),
+      ]);
+      final result = await container.read(dataProvider).getData();
 
-  test('getData returns null when HTTP status code is not 200', () async {
-    final container = ProviderContainer(overrides: [
-      dataProvider.overrideWithValue(ApiService()),
-    ]);
-
-    // Mock Dio client response with status code other than 200
-
-    // Call the getData method
-    final result = await container.read(dataProvider).getData();
-
-    // Verify that the result is null
-    expect(result, isNull);
+      expect(result, isNull);
+    });
   });
 }
