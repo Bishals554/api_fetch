@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomList extends StatelessWidget {
   final int id;
   final String employeeName;
-  final int employeeSalary;
+  final String employeeSalary;
   final int employeeAge;
   final String? profileImage;
   const CustomList({
@@ -46,11 +46,11 @@ class CustomList extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Name: $employeeName',
-                              style: const TextStyle(fontSize: 14),
+                              employeeName,
+                              style: const TextStyle(fontSize: 16),
                             ),
                             Text(
-                              'ID: $id',
+                              'Id: $id',
                               style: const TextStyle(fontSize: 14),
                             ),
                           ],
